@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #fafaf9;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --accent: #2c2c2c;
+            --border: #e5e5e5;
+            --shadow: rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 80px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.5rem;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .tab {
+            padding: 14px 28px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+
+        .tab:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .tab.active::before {
+            left: 0;
+        }
+
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px var(--shadow);
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .gallery-content {
+            display: none;
+        }
+
+        .gallery-content.active {
+            display: block;
+        }
+
+        .slideshow {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            aspect-ratio: 9 / 16;
+            background: #f5f5f5;
+            cursor: pointer;
+        }
+
+        .slideshow.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            aspect-ratio: auto;
+            z-index: 9999;
+            background: #000000;
+            margin: 0;
+        }
+
+        .slideshow.fullscreen .slide {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slideshow.fullscreen .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slideshow.fullscreen .upload-area {
+            display: none !important;
+        }
+
+        /* 전체화면일 때 버튼들과 슬라이드 정보 숨김 */
+        .slideshow.fullscreen ~ .slideshow-start-btn,
+        .slideshow.fullscreen ~ .edit-mode-btn,
+        .slideshow.fullscreen ~ .slide-info {
+            display: none !important;
+        }
+
+        .close-fullscreen {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-fullscreen:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .slideshow.fullscreen .close-fullscreen {
+            display: flex;
+        }
+
+        .upload-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px dashed var(--border);
+            z-index: 10;
+        }
+
+        .upload-area.dragover {
+            background: rgba(240, 240, 240, 0.98);
+            border-color: var(--accent);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        .edit-mode-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        .edit-mode-btn:hover {
+            background: #1a1a1a;
+        }
+
+        .slideshow-start-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: white;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        .slideshow-start-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .slideshow.edit-mode .upload-area {
+            display: flex;
+        }
+
+        .slideshow.edit-mode {
+            cursor: default;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slide-info {
+            padding: 40px;
+            background: var(--bg-secondary);
+            text-align: center;
+        }
+
+        .slide-counter {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+            font-weight: 300;
+        }
+
+        .location-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+
+        .instructions {
+            margin-top: 60px;
+            padding: 40px;
+            background: var(--bg-secondary);
+            border-left: 2px solid var(--accent);
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+
+        .instructions h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .instructions p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 12px;
+            font-weight: 300;
+        }
+
+        .instructions code {
+            background: var(--bg-primary);
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--accent);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .tabs {
+                gap: 6px;
+            }
+
+            .tab {
+                padding: 10px 18px;
+                font-size: 0.85rem;
+            }
+
+            .slideshow {
+                max-width: 100%;
+            }
+
+            .slide-info {
+                padding: 30px 20px;
+            }
+
+            .location-name {
+                font-size: 1.4rem;
+            }
+
+            .instructions {
+                padding: 30px 20px;
+            }
+
+            .edit-mode-btn {
+                bottom: 10px;
+                right: 10px;
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+
+            .slideshow-start-btn {
+                bottom: 10px;
+                left: 10px;
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+
+            .close-fullscreen {
+                top: 20px;
+                right: 20px;
+                width: 35px;
+                height: 35px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Coffee Silo</h1>
+            <p class="subtitle">Explore Our Locations</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="tab1">아크 12F</button>
+            <button class="tab" data-tab="tab2">아크 4F</button>
+            <button class="tab" data-tab="tab3">지재센 12F</button>
+            <button class="tab" data-tab="tab4">지재센 14F</button>
+            <button class="tab" data-tab="tab5">피나클 2F</button>
+            <button class="tab" data-tab="tab6">한타 7F</button>
+            <button class="tab" data-tab="tab7">신논현 토스 오피스</button>
+        </div>
+
+        <div class="gallery-container">
+            <div class="gallery-content active" id="tab1">
+                <div class="slideshow" id="slideshow-tab1" data-tab="tab1">
+                    <div class="slide active">
+                        <div class="placeholder">이미지를 추가해주세요</div>
+                    </div>
+                    <button class="close-fullscreen">×</button>
+                </div>
+                <button class="slideshow-start-btn" data-target="slideshow-tab1">▶ 슬라이드쇼 시작</button>
+                <div class="slide-info">
+                    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+                    <h2 class="location-name">아크 12F</h2>
+                </div>
+            </div>
+
+            <div class="gallery-content" id="tab2">
+                <div class="slideshow" id="slideshow-tab2" data-tab="tab2">
+                    <div class="slide active">
+                        <div class="placeholder">이미지를 추가해주세요</div>
+                    </div>
+                    <button class="close-fullscreen">×</button>
+                </div>
+                <button class="slideshow-start-btn" data-target="slideshow-tab2">▶ 슬라이드쇼 시작</button>
+                <div class="slide-info">
+                    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+                    <h2 class="location-name">아크 4F</h2>
+                </div>
+            </div>
+
+            <div class="gallery-content" id="tab3">
+                <div class="slideshow" id="slideshow-tab3" data-tab="tab3">
+                    <div class="slide active">
+                        <div class="placeholder">이미지를 추가해주세요</div>
+                    </div>
+                    <button class="close-fullscreen">×</button>
+                </div>
+                <button class="slideshow-start-btn" data-target="slideshow-tab3">▶ 슬라이드쇼 시작</button>
+                <div class="slide-info">
+                    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+                    <h2 class="location-name">지재센 12F</h2>
+                </div>
+            </div>
+
+            <div class="gallery-content" id="tab4">
+                <div class="slideshow" id="slideshow-tab4" data-tab="tab4">
+                    <div class="slide active">
+                        <div class="placeholder">이미지를 추가해주세요</div>
+                    </div>
+                    <button class="close-fullscreen">×</button>
+                </div>
+                <button class="slideshow-start-btn" data-target="slideshow-tab4">▶ 슬라이드쇼 시작</button>
+                <div class="slide-info">
+                    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+                    <h2 class="location-name">지재센 14F</h2>
+                </div>
+            </div>
+
+            <div class="gallery-content" id="tab5">
+                <div class="slideshow" id="slideshow-tab5" data-tab="tab5">
+                    <div class="slide active">
+                        <div class="placeholder">이미지를 추가해주세요</div>
+                    </div>
+                    <button class="close-fullscreen">×</button>
+                </div>
+                <button class="slideshow-start-btn" data-target="slideshow-tab5">▶ 슬라이드쇼 시작</button>
+                <div class="slide-info">
+                    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+                    <h2 class="location-name">피나클 2F</h2>
+                </div>
+            </div>
+
+            <div class="gallery-content" id="tab6">
+                <div class="slideshow" id="slideshow-tab6" data-tab="tab6">
+                    <div class="slide active">
+                        <div class="placeholder">이미지를 추가해주세요</div>
+                    </div>
+                    <button class="close-fullscreen">×</button>
+                </div>
+                <button class="slideshow-start-btn" data-target="slideshow-tab6">▶ 슬라이드쇼 시작</button>
+                <div class="slide-info">
+                    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+                    <h2 class="location-name">한타 7F</h2>
+                </div>
+            </div>
+
+            <div class="gallery-content" id="tab7">
+                <div class="slideshow" id="slideshow-tab7" data-tab="tab7">
+                    <div class="slide active">
+                        <div class="placeholder">이미지를 추가해주세요</div>
+                    </div>
+                    <button class="close-fullscreen">×</button>
+                </div>
+                <button class="slideshow-start-btn" data-target="slideshow-tab7">▶ 슬라이드쇼 시작</button>
+                <div class="slide-info">
+                    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+                    <h2 class="location-name">신논현 토스 오피스</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>이미지 관리 방법 (관리자용)</h3>
+            <p><strong>1단계:</strong> GitHub 저장소에 `images` 폴더를 만드세요.</p>
+            <p><strong>2단계:</strong> 각 탭별로 하위 폴더를 만드세요:
+                <br>&nbsp;&nbsp;• `images/tab1/` - 아크 12F
+                <br>&nbsp;&nbsp;• `images/tab2/` - 아크 4F
+                <br>&nbsp;&nbsp;• `images/tab3/` - 지재센 12F
+                <br>&nbsp;&nbsp;• ... (tab7까지)
+            </p>
+            <p><strong>3단계:</strong> 각 폴더에 이미지를 업로드하세요 (1.jpg, 2.jpg, 3.jpg ...)</p>
+            <p><strong>4단계:</strong> 아래 HTML 코드에서 각 탭의 슬라이드를 수정하세요:</p>
+            <p style="margin-left: 20px; font-family: 'Courier New', monospace; font-size: 0.9em; color: var(--accent); background: var(--bg-primary); padding: 10px; border-radius: 4px;">
+                &lt;div class="slide active"&gt;<br>
+                &nbsp;&nbsp;&lt;img src="images/tab1/1.jpg" alt="아크 12F 사진 1"&gt;<br>
+                &lt;/div&gt;<br>
+                &lt;div class="slide"&gt;<br>
+                &nbsp;&nbsp;&lt;img src="images/tab1/2.jpg" alt="아크 12F 사진 2"&gt;<br>
+                &lt;/div&gt;
+            </p>
+            <p style="margin-top: 20px; color: var(--text-secondary); font-size: 0.9rem;">
+                💡 팁: 세로 이미지(9:16 비율)에 최적화되어 있습니다. 첫 번째 슬라이드에만 `active` 클래스를 추가하세요.
+            </p>
+        </div>
+    </div>
+
+    <script>
+/*
+  개선 내용 요약:
+  - 각 슬라이드쇼 인스턴스별로 상태(start/interval/currentIdx)를 명확히 관리
+  - "진짜" 전체화면 API(requestFullscreen / exitFullscreen) 사용 (사용자 제스처 내에서 호출)
+  - fullscreenchange 이벤트로 클래스/스크롤 동기화
+  - 클릭/업로드/에디트 모드 충돌 방지
+*/
+document.addEventListener('DOMContentLoaded', () => {
+  initTabs();
+  initSlideshowStartButtons();
+  initFullscreenHandlers();
+  
+  // 초기 탭 활성화
+  const activeTab = document.querySelector('.tab.active')?.dataset.tab || 'tab1';
+  startSlideshowForTab(activeTab);
+});
+
+const slideshowState = {}; // { tabId: { intervalId, currentIndex } }
+
+// 탭 전환
+function initTabs(){
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tabId = tab.dataset.tab;
+      // deactivate all
+      tabs.forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.gallery-content').forEach(c => c.classList.remove('active'));
+      // activate clicked
+      tab.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+      // stop all intervals
+      Object.values(slideshowState).forEach(s => {
+        if (s.intervalId) clearInterval(s.intervalId);
+      });
+      startSlideshowForTab(tabId);
+    });
+  });
+}
+
+// 슬라이드쇼 시작 (tabId: 'tab1' 등)
+function startSlideshowForTab(tabId) {
+  const slideshow = document.getElementById(`slideshow-${tabId}`);
+  if (!slideshow) return;
+  const slides = Array.from(slideshow.querySelectorAll('.slide'));
+  const counter = slideshow.parentElement.querySelector('.slide-counter');
+  const totalElem = counter?.querySelector('.total');
+  const currentElem = counter?.querySelector('.current');
+
+  // 초기 total/current 세팅
+  const total = slides.length || 0;
+  if (totalElem) totalElem.textContent = total;
+  if (currentElem) currentElem.textContent = total ? 1 : 1;
+
+  // clear previous interval if any
+  if (slideshowState[tabId]?.intervalId) {
+    clearInterval(slideshowState[tabId].intervalId);
+  }
+
+  // 한 장 이하이면 자동 슬라이드 안 함
+  if (total <= 1) {
+    slideshowState[tabId] = { intervalId: null, currentIndex: 0 };
+    return;
+  }
+
+  let currentIndex = 0;
+  // ensure only one active
+  slides.forEach((s, i) => s.classList.toggle('active', i === 0));
+  if (currentElem) currentElem.textContent = 1;
+
+  const intervalId = setInterval(() => {
+    slides[currentIndex].classList.remove('active');
+    currentIndex = (currentIndex + 1) % slides.length;
+    slides[currentIndex].classList.add('active');
+    if (currentElem) currentElem.textContent = currentIndex + 1;
+  }, 5000);
+
+  slideshowState[tabId] = { intervalId, currentIndex };
+}
+
+// ===== 안전한 전체화면 래퍼 =====
+function requestFullscreenOnElement(el) {
+  if (!el) return Promise.reject(new Error('no element'));
+
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+  if (!req) {
+    // API 자체 미지원 -> CSS 폴백
+    applyCssFullscreenFallback(el);
+    showPermissionToast('브라우저가 전체화면 API를 지원하지 않아 CSS 폴백으로 표시합니다.');
+    return Promise.resolve('css-fallback');
+  }
+
+  // 실제 요청 (반드시 사용자 제스처 내에서 호출해야 브라우저에서 허용)
+  return req.call(el)
+    .then(() => {
+      // 성공
+      return 'native';
+    })
+    .catch(err => {
+      // 실패 사유(권한정책 등) -> CSS 폴백
+      console.warn('requestFullscreen 실패:', err);
+      applyCssFullscreenFallback(el);
+      showPermissionToast('전체화면 요청이 차단되어 CSS 폴백으로 표시합니다.');
+      return 'css-fallback';
+    });
+}
+
+function applyCssFullscreenFallback(el) {
+  if (!el) return;
+  el.classList.add('fullscreen');
+  document.body.style.overflow = 'hidden';
+}
+
+function exitCssFullscreenFallback(el) {
+  if (!el) return;
+  el.classList.remove('fullscreen');
+  document.body.style.overflow = '';
+}
+
+function showPermissionToast(msg) {
+  const id = 'fs-perm-toast';
+  if (document.getElementById(id)) return;
+  const d = document.createElement('div');
+  d.id = id;
+  d.textContent = msg || '전체화면 권한이 없어 CSS 폴백을 사용합니다.';
+  Object.assign(d.style, {
+    position: 'fixed', left: '50%', transform: 'translateX(-50%)',
+    bottom: '18px', background: '#111', color: '#fff', padding: '10px 14px',
+    borderRadius: '8px', zIndex: 30000, fontSize: '13px', opacity: '0.95'
+  });
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 6000);
+}
+
+// ===== 슬라이드쇼 시작 버튼 =====
+function initSlideshowStartButtons() {
+  const startBtns = document.querySelectorAll('.slideshow-start-btn');
+  startBtns.forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const targetId = btn.dataset.target;
+      const slideshow = document.getElementById(targetId);
+      if (!slideshow) return;
+
+      // 먼저 UI 표시(빠른 반응)
+      slideshow.classList.add('fullscreen');
+
+      // 사용자 제스처 내에서 requestFullscreen 시도
+      const result = await requestFullscreenOnElement(slideshow);
+      // result === 'native' or 'css-fallback'
+    });
+  });
+}
+
+// ===== 전체화면 핸들러 =====
+function initFullscreenHandlers() {
+  // 닫기 버튼
+  document.querySelectorAll('.close-fullscreen').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const slideshow = btn.closest('.slideshow');
+      if (!slideshow) return;
+
+      // If native fullscreen active on this element, exit native
+      if (document.fullscreenElement === slideshow) {
+        const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+        if (exit) {
+          exit.call(document).catch(()=>{/*ignore*/});
+        }
+      }
+      // Always remove CSS fallback
+      exitCssFullscreenFallback(slideshow);
+    });
+  });
+
+  // fullscreenchange 동기화 (브라우저 네이티브 전체화면 변동 시)
+  document.addEventListener('fullscreenchange', () => {
+    const fsEl = document.fullscreenElement;
+    // 모든 slideshow에 대해, native가 아니면 css 클래스 제거
+    document.querySelectorAll('.slideshow').forEach(s => {
+      if (!fsEl || s !== fsEl) {
+        s.classList.remove('fullscreen');
+      } else {
+        // native 활성 슬라이드쇼 --> 보장
+        s.classList.add('fullscreen');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+    if (!document.fullscreenElement) {
+      document.body.style.overflow = '';
+    }
+  });
+
+  // ESC 키 보조 (브라우저가 기본 동작을 처리하지만 CSS 폴백 케어)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const cssFs = document.querySelector('.slideshow.fullscreen');
+      if (cssFs && !document.fullscreenElement) {
+        exitCssFullscreenFallback(cssFs);
+      }
+    }
+  });
+}
+    </script>
+</body>
+</html>
