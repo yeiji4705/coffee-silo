@@ -4,15 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Office Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        @font-face {
-            font-family: 'Toss Product Sans';
-            src: url('TossProductSansTTF-Semibold.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -30,7 +23,7 @@
         }
 
         body {
-            font-family: 'Toss Product Sans', sans-serif;
+            font-family: 'Noto Sans KR', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
@@ -50,7 +43,7 @@
         }
 
         h1 {
-            font-family: 'Toss Product Sans', sans-serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 3.5rem;
             font-weight: 300;
             letter-spacing: 0.02em;
@@ -333,7 +326,7 @@
         }
 
         .location-name {
-            font-family: 'Toss Product Sans', sans-serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 1.8rem;
             font-weight: 400;
             color: var(--text-primary);
@@ -362,7 +355,7 @@
         }
 
         .instructions h3 {
-            font-family: 'Toss Product Sans', sans-serif;
+            font-family: 'Cormorant Garamond', serif;
             font-size: 1.5rem;
             font-weight: 400;
             margin-bottom: 20px;
@@ -478,6 +471,7 @@
     <div class="container">
         <header>
             <h1>Coffee Silo</h1>
+            <p class="subtitle">Explore Our Locations</p>
         </header>
 
         <div class="tabs">
@@ -488,8 +482,8 @@
             <button class="tab" data-tab="tab5">피나클</button>
             <button class="tab" data-tab="tab6">한타 7F</button>
             <button class="tab" data-tab="tab7">신논현 토스 오피스</button>
-            <button class="tab" data-tab="notice">Notice</button>
             <button class="tab" data-tab="N1">NEW</button>
+            <button class="tab" data-tab="notice">Notice</button>
         </div>
 
         <div class="gallery-container">
@@ -699,6 +693,20 @@
                 </div>
             </div>
 
+            <div class="gallery-content" id="N1">
+                <div class="slideshow" id="slideshow-N1" data-tab="N1">
+                    <div class="slide active">
+                        <img src="images/NEW/1.jpg" alt="NEW">
+                    </div>
+                    <button class="close-fullscreen">×</button>
+                </div>
+                <button class="slideshow-start-btn" data-target="slideshow-N1">▶ 슬라이드쇼 시작</button>
+                <div class="slide-info">
+                    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+                    <h2 class="location-name">NEW</h2>
+                </div>
+            </div>
+
             <div class="gallery-content" id="notice">
                 <div class="slideshow" id="slideshow-notice" data-tab="notice">
                     <div class="slide active">
@@ -712,20 +720,6 @@
                     <h2 class="location-name">Notice</h2>
                 </div>
             </div>
-
-            <div class="gallery-content" id="N1">
-                <div class="slideshow" id="slideshow-N1" data-tab="N1">
-                    <div class="slide active">
-                        <img src="images/N1/1.jpg" alt="NEW">
-                    </div>
-                    <button class="close-fullscreen">×</button>
-                </div>
-                <button class="slideshow-start-btn" data-target="slideshow-N1">▶ 슬라이드쇼 시작</button>
-                <div class="slide-info">
-                    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
-                    <h2 class="location-name">NEW</h2>
-                </div>
-            </div>
         </div>
 
         <div class="instructions">
@@ -735,7 +729,7 @@
                 <br>&nbsp;&nbsp;• `images/tab1/` - 아크 12F
                 <br>&nbsp;&nbsp;• `images/tab2/` - 아크 4F
                 <br>&nbsp;&nbsp;• `images/tab3/` - 지재센 12F
-                <br>&nbsp;&nbsp;• ... (tab7까지)
+                <br>&nbsp;&nbsp;• ... (tab7까지, NEW는 images/NEW/)
             </p>
             <p><strong>3단계:</strong> 각 폴더에 이미지를 업로드하세요 (1.jpg, 2.jpg, 3.jpg ...)</p>
             <p><strong>4단계:</strong> 아래 HTML 코드에서 각 탭의 슬라이드를 수정하세요:</p>
