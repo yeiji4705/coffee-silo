@@ -4,8 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Office Gallery</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'Toss Product Sans';
+            src: url('fonts/TossProductSansTTF-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        button, input, select, textarea {
+            font-family: inherit;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -23,7 +35,7 @@
         }
 
         body {
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Toss Product Sans', 'Noto Sans KR', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
@@ -43,7 +55,7 @@
         }
 
         h1 {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Toss Product Sans', 'Noto Sans KR', sans-serif;
             font-size: 3.5rem;
             font-weight: 300;
             letter-spacing: 0.02em;
@@ -326,7 +338,7 @@
         }
 
         .location-name {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Toss Product Sans', 'Noto Sans KR', sans-serif;
             font-size: 1.8rem;
             font-weight: 400;
             color: var(--text-primary);
@@ -355,7 +367,7 @@
         }
 
         .instructions h3 {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Toss Product Sans', 'Noto Sans KR', sans-serif;
             font-size: 1.5rem;
             font-weight: 400;
             margin-bottom: 20px;
@@ -471,7 +483,6 @@
     <div class="container">
         <header>
             <h1>Coffee Silo</h1>
-            <p class="subtitle">Explore Our Locations</p>
         </header>
 
         <div class="tabs">
