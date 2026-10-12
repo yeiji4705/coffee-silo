@@ -705,7 +705,7 @@
             </div>
 
             <div class="gallery-content" id="N1">
-                <div class="slideshow" id="slideshow-N1" data-tab="N1">
+                <div class="slideshow" id="slideshow-N1" data-tab="N1" data-interval="10000">
                     <div class="slide active">
                         <img src="images/NEW/1.jpg" alt="NEW">
                     </div>
@@ -837,7 +837,7 @@ function startSlideshowForTab(tabId) {
     currentIndex = (currentIndex + 1) % slides.length;
     slides[currentIndex].classList.add('active');
     if (currentElem) currentElem.textContent = currentIndex + 1;
-  }, 8000);
+  }, Number(slideshow.dataset.interval) || 8000); // 탭별 data-interval(ms), 없으면 8초
 
   slideshowState[tabId] = { intervalId, currentIndex };
 }
